@@ -1,54 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: black; /* optional, looks nicer if aspect ratio doesn't match exactly */
-    }
-
-    #gameContainer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      transform-origin: top left;
-    }
-
-    #gameFrame {
-      border: none;
-      width: 800px;  /* original game width */
-      height: 600px; /* original game height */
-      display: block;
-    }
-  </style>
-</head>
 <body>
-  <div id="gameContainer">
-    <iframe id="gameFrame" src="https://frogiesarcade.win/algebra.html" title="Roblox"></iframe>
+
+<!-- LOADING OVERLAY -->
+<div id="loader">
+  <canvas id="particles"></canvas>
+  <div id="loading-text">LOADING</div>
+  <div class="spinner"></div>
+</div>
+
+<!-- GAME CONTAINER -->
+<div id="frameframe" style="width: 100vw; height: 100vh; position: relative; overflow: hidden;">
+  <div id="antideledao" style="display: none;"></div>
+  <div class="sidebar">
+      <img class="headericons" src="/stuff/icons/fullscreen.svg" onclick="goFullscreen('frameframeframe'); return false">
+      <img class="headericons" id="reload" src="/stuff/icons/reload.svg">
+      <img class="headericons" id="chat" src="/stuff/icons/comment-solid.svg" onclick="toggleScript()">
   </div>
+  <iframe 
+    id="frameframeframe" 
+    sandbox="allow-scripts allow-pointer-lock allow-forms allow-same-origin allow-downloads" 
+    allowfullscreen="true" 
+    src="/embed.html#https://nowgg.fun/apps/a/19900/b.html" 
+    frameborder="0" 
+    style="width: 100%; height: 100%; border: none; display: block;">
+  </iframe>
+</div>
 
-  <script>
-    const container = document.getElementById('gameContainer');
-    const originalWidth = 800;  // change if your game has a different width
-    const originalHeight = 600; // change if your game has a different height
+<script>
+// ===== PARTICLES =====
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
 
-    function resizeGame() {
-      const scaleX = window.innerWidth / originalWidth;
-      const scaleY = window.innerHeight / originalHeight;
-      const scale = Math.min(scaleX, scaleY); // keeps aspect ratio
-      container.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    }
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-    window.addEventListener('resize', resizeGame);
-    resizeGame(); // initial resize
-  </script>
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
+    this.alpha = Math.random() * 0.6 + 0.2;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+let particles = [];
+for (let i = 0; i < 150; i++) {
+  particles.push(new Particle());
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ===== LOADING TIMER =====
+setTimeout(() => {
+  const loader = document.getElementById("loader");
+  loader.style.opacity = "0";
+  setTimeout(() => loader.remove(), 1000);
+}, 7000);
+</script>
+
 </body>
-</html>
