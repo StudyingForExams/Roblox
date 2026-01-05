@@ -1,34 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Roblox</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* IFRAME */
+iframe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none; /* hidden until loader finishes */
+}
+
+/* LOADING OVERLAY */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #1a001f, #000);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 1s ease;
+}
+
+/* CANVAS */
+#particles {
+  position: absolute;
+  inset: 0;
+}
+
+/* TEXT */
+#loading-text {
+  color: #d8b4ff;
+  font-size: 28px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  z-index: 2;
+  text-shadow: 0 0 15px rgba(180, 100, 255, 0.6);
+}
+
+/* SPINNER */
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 4px solid rgba(180, 100, 255, 0.2);
+  border-top: 4px solid #b46bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+
 <body>
 
-<!-- LOADING OVERLAY -->
+<!-- LOADER -->
 <div id="loader">
   <canvas id="particles"></canvas>
   <div id="loading-text">LOADING</div>
   <div class="spinner"></div>
 </div>
 
-<!-- GAME CONTAINER -->
-<div id="frameframe" style="width: 100vw; height: 100vh; position: relative; overflow: hidden;">
-  <div id="antideledao" style="display: none;"></div>
-  <div class="sidebar">
-      <img class="headericons" src="/stuff/icons/fullscreen.svg" onclick="goFullscreen('frameframeframe'); return false">
-      <img class="headericons" id="reload" src="/stuff/icons/reload.svg">
-      <img class="headericons" id="chat" src="/stuff/icons/comment-solid.svg" onclick="toggleScript()">
-  </div>
-  <iframe 
-    id="frameframeframe" 
-    sandbox="allow-scripts allow-pointer-lock allow-forms allow-same-origin allow-downloads" 
-    allowfullscreen="true" 
-    src="/embed.html#https://nowgg.fun/apps/a/19900/b.html" 
-    frameborder="0" 
-    style="width: 100%; height: 100%; border: none; display: block;">
-  </iframe>
-</div>
+<!-- GAME -->
+<iframe src="https://frogiesarcade.win/embed.html#https://nowgg.fun/apps/a/19900/b.html" allowfullscreen></iframe>
 
 <script>
 // ===== PARTICLES =====
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
+
+let particles = [];
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -64,7 +127,6 @@ class Particle {
   }
 }
 
-let particles = [];
 for (let i = 0; i < 150; i++) {
   particles.push(new Particle());
 }
@@ -84,7 +146,20 @@ setTimeout(() => {
   const loader = document.getElementById("loader");
   loader.style.opacity = "0";
   setTimeout(() => loader.remove(), 1000);
-}, 7000);
+
+  // Show the iframe after loader
+  document.querySelector("iframe").style.display = "block";
+}, 5000);
+
+// ===== IFRAME RESIZE =====
+function resizeIframe() {
+  const f = document.querySelector("iframe");
+  f.style.width = window.innerWidth + "px";
+  f.style.height = window.innerHeight + "px";
+}
+window.addEventListener("resize", resizeIframe);
+resizeIframe();
 </script>
 
 </body>
+</html>
