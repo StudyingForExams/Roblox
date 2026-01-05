@@ -1,141 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Currently Disabled Notice</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Roblox</title>
+
 <style>
-  /* Reset and base */
-  html, body {
-    margin: 0; padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: #10001f; /* deep black-purple */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d8b4ff;
-    text-align: center;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+  font-family: 'Segoe UI', sans-serif;
+}
 
-  /* Container for text */
-  #message {
-    position: relative;
-    z-index: 10;
-    max-width: 90vw;
-    font-weight: 700;
-    font-size: clamp(1.8rem, 4vw, 3.2rem);
-    line-height: 1.3;
-    text-shadow:
-      0 0 10px #b46bff88,
-      0 0 20px #b46bffcc,
-      0 0 30px #b46bffdd,
-      0 0 40px #d8b4ffee;
-    user-select: none;
-  }
+/* IFRAME */
+iframe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none; /* hidden until loader finishes */
+}
 
-  /* Bubble effect behind the text */
-  #message::before {
-    content: "";
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 150%;
-    height: 150%;
-    background: radial-gradient(circle at center, #4a157f88, #12002b00);
-    filter: blur(35px);
-    z-index: -1;
-    border-radius: 30px;
-  }
+/* LOADING OVERLAY */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #1a001f, #000);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 1s ease;
+}
 
-  /* Canvas full screen for particles */
-  #particles {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-  }
+/* CANVAS */
+#particles {
+  position: absolute;
+  inset: 0;
+}
 
+/* TEXT */
+#loading-text {
+  color: #d8b4ff;
+  font-size: 28px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  z-index: 2;
+  text-shadow: 0 0 15px rgba(180, 100, 255, 0.6);
+}
+
+/* SPINNER */
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 4px solid rgba(180, 100, 255, 0.2);
+  border-top: 4px solid #b46bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>
 </head>
+
 <body>
 
-<canvas id="particles"></canvas>
-
-<div id="message">
-  Currently Disabled<br />
-  Fix In Progress<br />
-  Might Take A Few Days
+<!-- LOADER -->
+<div id="loader">
+  <canvas id="particles"></canvas>
+  <div id="loading-text">LOADING</div>
+  <div class="spinner"></div>
 </div>
 
+<!-- GAME -->
+<iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-120%2Cir.louge.dul%2Fcprs-a-1%3B920-b%2Chvmn" allowfullscreen></iframe>
+
 <script>
-  const canvas = document.getElementById("particles");
-  const ctx = canvas.getContext("2d");
+// ===== PARTICLES =====
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
+    this.alpha = Math.random() * 0.6 + 0.2;
   }
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
 
-  class Particle {
-    constructor() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height;
-      this.radius = Math.random() * 3 + 2;
-      this.speedX = (Math.random() - 0.5) * 0.5;
-      this.speedY = (Math.random() - 0.5) * 0.5;
-      this.color = Math.random() > 0.5 ? "rgba(180,107,255,0.7)" : "rgba(43,0,51,0.6)";
-      this.alpha = Math.random() * 0.7 + 0.3;
-      this.pulse = Math.random() * 0.05 + 0.01;
-      this.growing = true;
-    }
-    update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
-
-      // Bounce off edges
-      if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-      if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-
-      // Pulse radius between 2 and 5
-      if (this.growing) {
-        this.radius += this.pulse;
-        if (this.radius >= 5) this.growing = false;
-      } else {
-        this.radius -= this.pulse;
-        if (this.radius <= 2) this.growing = true;
-      }
-    }
-    draw() {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      ctx.globalAlpha = this.alpha;
-      ctx.shadowColor = this.color;
-      ctx.shadowBlur = 12;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
-    }
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
   }
-
-  let particles = [];
-  for (let i = 0; i < 120; i++) {
-    particles.push(new Particle());
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
   }
+}
 
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      p.update();
-      p.draw();
-    });
-    requestAnimationFrame(animate);
-  }
-  animate();
+for (let i = 0; i < 150; i++) {
+  particles.push(new Particle());
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ===== LOADING TIMER =====
+setTimeout(() => {
+  const loader = document.getElementById("loader");
+  loader.style.opacity = "0";
+  setTimeout(() => loader.remove(), 1000);
+
+  // Show the iframe after loader
+  document.querySelector("iframe").style.display = "block";
+}, 5000);
+
+// ===== IFRAME RESIZE =====
+function resizeIframe() {
+  const f = document.querySelector("iframe");
+  f.style.width = window.innerWidth + "px";
+  f.style.height = window.innerHeight + "px";
+}
+window.addEventListener("resize", resizeIframe);
+resizeIframe();
 </script>
 
 </body>
