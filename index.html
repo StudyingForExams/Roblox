@@ -16,7 +16,7 @@ html, body {
   font-family: "Parkinsans", "Segoe UI", sans-serif;
 }
 
-/* ================= IFRAME ================= */
+/* IFRAME */
 iframe {
   position: fixed;
   inset: 0;
@@ -77,16 +77,16 @@ iframe {
   transition: opacity 1s ease;
 }
 
-/* === MATCH REAL LAUNCH POSITION EXACTLY === */
+/* ✅ CORRECTED POSITION (LOWERED) */
 #skin-panel {
   position: absolute;
-  top: 45%;
+  top: 57%;
   left: 50%;
   transform: translate(-50%, -55%);
   text-align: center;
 }
 
-/* ================= FAKE SELECTS ================= */
+/* FAKE SELECTS */
 .fake-select {
   width: 300px;
   padding: 15px 1px;
@@ -100,7 +100,7 @@ iframe {
   box-shadow: 0 4px 6px rgba(0,0,0,.2);
 }
 
-/* ================= FAKE LAUNCH ================= */
+/* FAKE LAUNCH */
 #fake-launch {
   width: 200px;
   height: 75px;
@@ -121,14 +121,14 @@ iframe {
 
 <body>
 
-<!-- ================= LOADER ================= -->
+<!-- LOADER -->
 <div id="loader">
   <canvas id="particles"></canvas>
   <div id="loading-text">LOADING</div>
   <div class="spinner"></div>
 </div>
 
-<!-- ================= VISUAL RESKIN ================= -->
+<!-- VISUAL RESKIN -->
 <div id="skin-overlay">
   <div id="skin-panel">
     <div class="fake-select">1080p</div>
@@ -137,13 +137,13 @@ iframe {
   </div>
 </div>
 
-<!-- ================= REAL SITE ================= -->
+<!-- REAL SITE -->
 <iframe id="game"
 src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol"
 allowfullscreen></iframe>
 
 <script>
-/* ================= PARTICLES ================= */
+/* PARTICLES */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 let particles = [];
@@ -188,21 +188,18 @@ for (let i = 0; i < 120; i++) particles.push(new Particle());
   requestAnimationFrame(animate);
 })();
 
-/* ================= FLOW ================= */
+/* FLOW */
 const loader = document.getElementById("loader");
 const overlay = document.getElementById("skin-overlay");
 
-/* initial load */
 setTimeout(() => {
   loader.style.opacity = "0";
   setTimeout(() => loader.remove(), 1000);
 }, 5000);
 
-/* detect real launch click by exact position */
 document.addEventListener("mousedown", e => {
   const fake = document.getElementById("fake-launch");
   const r = fake.getBoundingClientRect();
-
   if (
     e.clientX >= r.left &&
     e.clientX <= r.right &&
