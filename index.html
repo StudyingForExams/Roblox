@@ -13,24 +13,26 @@ html, body {
   height: 100%;
   overflow: hidden;
   background: black;
-  font-family: "Parkinsans", "Segoe UI", sans-serif;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 /* IFRAME */
 iframe {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   border: none;
+  display: none; /* hidden until loader finishes */
 }
 
-/* LOADER */
+/* LOADING OVERLAY */
 #loader {
   position: fixed;
   inset: 0;
   background: radial-gradient(circle at center, #1a001f, #000);
-  z-index: 10000;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,83 +40,36 @@ iframe {
   transition: opacity 1s ease;
 }
 
+/* CANVAS */
 #particles {
   position: absolute;
   inset: 0;
 }
 
+/* TEXT */
 #loading-text {
   color: #d8b4ff;
   font-size: 28px;
   letter-spacing: 2px;
   margin-bottom: 20px;
   z-index: 2;
-  text-shadow: 0 0 15px rgba(180,100,255,0.6);
+  text-shadow: 0 0 15px rgba(180, 100, 255, 0.6);
 }
 
+/* SPINNER */
 .spinner {
   width: 70px;
   height: 70px;
-  border: 4px solid rgba(180,100,255,0.2);
+  border: 4px solid rgba(180, 100, 255, 0.2);
   border-top: 4px solid #b46bff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   z-index: 2;
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-/* OVERLAY */
-#skin-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 8000;
-  pointer-events: none;
-  background: radial-gradient(circle at center, rgba(26,0,31,.7), rgba(0,0,0,.9));
-  backdrop-filter: blur(16px);
-  transition: opacity 1s ease;
-}
-
-/* LOWERED PANEL */
-#skin-panel {
-  position: absolute;
-  top: 72%; /* Lowered significantly */
-  left: 50%;
-  transform: translate(-50%, -55%);
-  text-align: center;
-}
-
-/* FAKE SELECTS */
-.fake-select {
-  width: 300px;
-  padding: 15px 1px;
-  margin: 10px auto;
-  background-color: #1a1a1a44;
-  color: white;
-  border: 3px solid #3b3b3b3b;
-  border-radius: 30px;
-  font-size: 1.2em;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 6px rgba(0,0,0,.2);
-}
-
-/* FAKE LAUNCH */
-#fake-launch {
-  width: 200px;
-  height: 75px;
-  margin: 10px auto 0;
-  background-color: #1a1a1a44;
-  border: 5px solid #3b3b3b3b;
-  border-radius: 15px;
-  color: white;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 6px rgba(0,0,0,.2);
 }
 </style>
 </head>
@@ -128,98 +83,82 @@ iframe {
   <div class="spinner"></div>
 </div>
 
-<!-- OVERLAY -->
-<div id="skin-overlay">
-  <div id="skin-panel">
-    <div class="fake-select">1080p</div>
-    <div class="fake-select">60 fps</div>
-    <div id="fake-launch">Launch</div>
-  </div>
-</div>
-
-<!-- REAL SITE -->
-<iframe id="game"
-src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol"
-allowfullscreen></iframe>
+<!-- GAME -->
+<iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol" allowfullscreen></iframe>
 
 <script>
-/* PARTICLES */
+// ===== PARTICLES =====
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
+
 let particles = [];
 
 function resizeCanvas() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 resizeCanvas();
-addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
 class Particle {
   constructor() {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
-    this.r = Math.random() * 2 + 1;
-    this.dx = (Math.random() - .5) * .3;
-    this.dy = (Math.random() - .5) * .3;
-    this.a = Math.random() * .6 + .2;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
+    this.alpha = Math.random() * 0.6 + 0.2;
   }
   update() {
-    this.x += this.dx;
-    this.y += this.dy;
-    if (this.x < 0 || this.x > canvas.width) this.dx *= -1;
-    if (this.y < 0 || this.y > canvas.height) this.dy *= -1;
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
   }
   draw() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = "#fff";
-    ctx.globalAlpha = this.a;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
 }
 
-for (let i = 0; i < 120; i++) particles.push(new Particle());
+for (let i = 0; i < 150; i++) {
+  particles.push(new Particle());
+}
 
-(function animate() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animate);
-})();
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
 
-/* FLOW */
-const loader = document.getElementById("loader");
-const overlay = document.getElementById("skin-overlay");
-
+// ===== LOADING TIMER =====
 setTimeout(() => {
+  const loader = document.getElementById("loader");
   loader.style.opacity = "0";
   setTimeout(() => loader.remove(), 1000);
+
+  // Show the iframe after loader
+  document.querySelector("iframe").style.display = "block";
 }, 5000);
 
-document.addEventListener("mousedown", e => {
-  const fake = document.getElementById("fake-launch");
-  const r = fake.getBoundingClientRect();
-  if (
-    e.clientX >= r.left &&
-    e.clientX <= r.right &&
-    e.clientY >= r.top &&
-    e.clientY <= r.bottom
-  ) {
-    document.body.appendChild(loader);
-    loader.style.display = "flex";
-    loader.style.opacity = "1";
-
-    setTimeout(() => {
-      loader.style.opacity = "0";
-      overlay.style.opacity = "0";
-      setTimeout(() => {
-        loader.remove();
-        overlay.remove();
-      }, 1000);
-    }, 10000);
-  }
-});
+// ===== IFRAME RESIZE =====
+function resizeIframe() {
+  const f = document.querySelector("iframe");
+  f.style.width = window.innerWidth + "px";
+  f.style.height = window.innerHeight + "px";
+}
+window.addEventListener("resize", resizeIframe);
+resizeIframe();
 </script>
 
 </body>
