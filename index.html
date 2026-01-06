@@ -16,7 +16,7 @@ html, body {
   font-family: "Parkinsans", "Segoe UI", sans-serif;
 }
 
-/* IFRAME */
+/* ================= IFRAME ================= */
 iframe {
   position: fixed;
   inset: 0;
@@ -66,7 +66,7 @@ iframe {
   to { transform: rotate(360deg); }
 }
 
-/* ================= VISUAL RESKIN ================= */
+/* ================= RESKIN OVERLAY ================= */
 #skin-overlay {
   position: fixed;
   inset: 0;
@@ -74,18 +74,19 @@ iframe {
   pointer-events: none;
   background: radial-gradient(circle at center, rgba(26,0,31,.7), rgba(0,0,0,.9));
   backdrop-filter: blur(16px);
+  transition: opacity 1s ease;
 }
 
-/* CENTER PANEL */
+/* === MATCH REAL LAUNCH POSITION EXACTLY === */
 #skin-panel {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -55%);
   text-align: center;
 }
 
-/* FAKE SELECTS */
+/* ================= FAKE SELECTS ================= */
 .fake-select {
   width: 300px;
   padding: 15px 1px;
@@ -99,11 +100,11 @@ iframe {
   box-shadow: 0 4px 6px rgba(0,0,0,.2);
 }
 
-/* FAKE LAUNCH (VISUAL ONLY) */
+/* ================= FAKE LAUNCH ================= */
 #fake-launch {
   width: 200px;
   height: 75px;
-  margin: 20px auto 0;
+  margin: 10px auto 0;
   background-color: #1a1a1a44;
   border: 5px solid #3b3b3b3b;
   border-radius: 15px;
@@ -120,14 +121,14 @@ iframe {
 
 <body>
 
-<!-- LOADER -->
+<!-- ================= LOADER ================= -->
 <div id="loader">
   <canvas id="particles"></canvas>
   <div id="loading-text">LOADING</div>
   <div class="spinner"></div>
 </div>
 
-<!-- VISUAL OVERLAY -->
+<!-- ================= VISUAL RESKIN ================= -->
 <div id="skin-overlay">
   <div id="skin-panel">
     <div class="fake-select">1080p</div>
@@ -136,13 +137,13 @@ iframe {
   </div>
 </div>
 
-<!-- REAL SITE -->
+<!-- ================= REAL SITE ================= -->
 <iframe id="game"
 src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol"
 allowfullscreen></iframe>
 
 <script>
-/* ========== PARTICLES (WHITE) ========== */
+/* ================= PARTICLES ================= */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 let particles = [];
@@ -163,31 +164,31 @@ class Particle {
     this.dy = (Math.random() - .5) * .3;
     this.a = Math.random() * .6 + .2;
   }
+  update() {
+    this.x += this.dx;
+    this.y += this.dy;
+    if (this.x < 0 || this.x > canvas.width) this.dx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.dy *= -1;
+  }
   draw() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fillStyle = "#fff";
     ctx.globalAlpha = this.a;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
-  update() {
-    this.x += this.dx;
-    this.y += this.dy;
-    if (this.x<0||this.x>canvas.width) this.dx*=-1;
-    if (this.y<0||this.y>canvas.height) this.dy*=-1;
-    this.draw();
-  }
 }
 
-for (let i=0;i<120;i++) particles.push(new Particle());
-(function animate(){
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+(function animate() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>p.update());
+  particles.forEach(p => { p.update(); p.draw(); });
   requestAnimationFrame(animate);
 })();
 
-/* ========== FLOW ========== */
+/* ================= FLOW ================= */
 const loader = document.getElementById("loader");
 const overlay = document.getElementById("skin-overlay");
 
@@ -197,7 +198,7 @@ setTimeout(() => {
   setTimeout(() => loader.remove(), 1000);
 }, 5000);
 
-/* detect real launch click by position */
+/* detect real launch click by exact position */
 document.addEventListener("mousedown", e => {
   const fake = document.getElementById("fake-launch");
   const r = fake.getBoundingClientRect();
@@ -209,8 +210,8 @@ document.addEventListener("mousedown", e => {
     e.clientY <= r.bottom
   ) {
     document.body.appendChild(loader);
-    loader.style.opacity = "1";
     loader.style.display = "flex";
+    loader.style.opacity = "1";
 
     setTimeout(() => {
       loader.style.opacity = "0";
