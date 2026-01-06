@@ -19,20 +19,20 @@ html, body {
 /* IFRAME */
 iframe {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: none;
-  display: none; /* hidden until loader finishes */
+  opacity: 0;
+  transition: opacity 1.2s ease;
 }
 
-/* LOADING OVERLAY */
+/* LOADER */
 #loader {
   position: fixed;
   inset: 0;
   background: radial-gradient(circle at center, #1a001f, #000);
-  z-index: 9999;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,32 +40,91 @@ iframe {
   transition: opacity 1s ease;
 }
 
-/* CANVAS */
-#particles {
-  position: absolute;
+/* LAUNCHER OVERLAY */
+#launcher-overlay {
+  position: fixed;
   inset: 0;
+  z-index: 9000;
+  background: radial-gradient(circle at center, rgba(26,0,31,0.85), rgba(0,0,0,0.9));
+  backdrop-filter: blur(18px);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1s ease;
+}
+
+/* LAUNCHER PANEL */
+#launcher-panel {
+  pointer-events: auto;
+  text-align: center;
+  color: #fff;
+  padding: 40px;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.45);
+  box-shadow: 0 0 40px rgba(180,100,255,0.25);
+  min-width: 320px;
+}
+
+/* LOGO */
+#launcher-panel img {
+  width: 180px;
+  margin-bottom: 25px;
 }
 
 /* TEXT */
+#launcher-panel h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+#launcher-panel p {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 25px;
+}
+
+/* SELECTS */
+.launch-select {
+  width: 140px;
+  margin: 6px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  border: 1px solid #2b0033;
+}
+
+/* BUTTON */
+#launch-btn {
+  margin-top: 20px;
+  padding: 12px 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #b46bff, #7a2cff);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(180,100,255,0.5);
+}
+
+/* LOADER TEXT */
 #loading-text {
   color: #d8b4ff;
   font-size: 28px;
   letter-spacing: 2px;
   margin-bottom: 20px;
-  z-index: 2;
-  text-shadow: 0 0 15px rgba(180, 100, 255, 0.6);
+  text-shadow: 0 0 15px rgba(180,100,255,0.6);
 }
 
 /* SPINNER */
 .spinner {
   width: 70px;
   height: 70px;
-  border: 4px solid rgba(180, 100, 255, 0.2);
+  border: 4px solid rgba(180,100,255,0.2);
   border-top: 4px solid #b46bff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  z-index: 2;
-  box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
+  box-shadow: 0 0 20px rgba(180,100,255,0.5);
 }
 
 @keyframes spin {
@@ -78,87 +137,65 @@ iframe {
 
 <!-- LOADER -->
 <div id="loader">
-  <canvas id="particles"></canvas>
   <div id="loading-text">LOADING</div>
   <div class="spinner"></div>
 </div>
 
+<!-- LAUNCHER -->
+<div id="launcher-overlay">
+  <div id="launcher-panel">
+    <img src="images/roblox.png" alt="Roblox">
+
+    <h1>nowgg.fun launcher</h1>
+    <p>Select your preferred resolution and frame rate</p>
+
+    <div>
+      <select class="launch-select">
+        <option>1080p</option>
+        <option>720p</option>
+      </select>
+
+      <select class="launch-select">
+        <option>60 fps</option>
+        <option>30 fps</option>
+      </select>
+    </div>
+
+    <button id="launch-btn">Launch</button>
+  </div>
+</div>
+
 <!-- GAME -->
-<iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol" allowfullscreen></iframe>
+<iframe id="game" src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol" allowfullscreen></iframe>
 
 <script>
-// ===== PARTICLES =====
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
+const loader = document.getElementById("loader");
+const launcher = document.getElementById("launcher-overlay");
+const game = document.getElementById("game");
+const launchBtn = document.getElementById("launch-btn");
 
-let particles = [];
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-class Particle {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.radius = Math.random() * 2 + 1;
-    this.speedX = (Math.random() - 0.5) * 0.4;
-    this.speedY = (Math.random() - 0.5) * 0.4;
-    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
-    this.alpha = Math.random() * 0.6 + 0.2;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-
-    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
-    ctx.globalAlpha = this.alpha;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-}
-
-for (let i = 0; i < 150; i++) {
-  particles.push(new Particle());
-}
-
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => {
-    p.update();
-    p.draw();
-  });
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-// ===== LOADING TIMER =====
+/* INITIAL LOAD */
 setTimeout(() => {
-  const loader = document.getElementById("loader");
   loader.style.opacity = "0";
-  setTimeout(() => loader.remove(), 1000);
-
-  // Show the iframe after loader
-  document.querySelector("iframe").style.display = "block";
+  setTimeout(() => loader.style.display = "none", 1000);
 }, 5000);
 
-// ===== IFRAME RESIZE =====
-function resizeIframe() {
-  const f = document.querySelector("iframe");
-  f.style.width = window.innerWidth + "px";
-  f.style.height = window.innerHeight + "px";
-}
-window.addEventListener("resize", resizeIframe);
-resizeIframe();
+/* LAUNCH BUTTON */
+launchBtn.addEventListener("click", () => {
+  launcher.style.opacity = "0";
+  setTimeout(() => launcher.style.display = "none", 1000);
+
+  loader.style.display = "flex";
+  loader.style.opacity = "1";
+
+  setTimeout(() => {
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = "none";
+      game.style.opacity = "1";
+    }, 1000);
+  }, 10000);
+});
 </script>
 
 </body>
