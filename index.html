@@ -25,7 +25,7 @@ iframe {
   border: none;
 }
 
-/* ================= LOADER ================= */
+/* LOADER */
 #loader {
   position: fixed;
   inset: 0;
@@ -66,7 +66,7 @@ iframe {
   to { transform: rotate(360deg); }
 }
 
-/* ================= RESKIN OVERLAY ================= */
+/* OVERLAY */
 #skin-overlay {
   position: fixed;
   inset: 0;
@@ -77,10 +77,10 @@ iframe {
   transition: opacity 1s ease;
 }
 
-/* ✅ CORRECTED POSITION (LOWERED) */
+/* LOWERED PANEL */
 #skin-panel {
   position: absolute;
-  top: 57%;
+  top: 72%; /* Lowered significantly */
   left: 50%;
   transform: translate(-50%, -55%);
   text-align: center;
@@ -128,7 +128,7 @@ iframe {
   <div class="spinner"></div>
 </div>
 
-<!-- VISUAL RESKIN -->
+<!-- OVERLAY -->
 <div id="skin-overlay">
   <div id="skin-panel">
     <div class="fake-select">1080p</div>
