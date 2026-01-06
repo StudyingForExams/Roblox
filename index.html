@@ -24,11 +24,10 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
-  display: none;
-  z-index: 1;
+  display: none; /* hidden until loader finishes */
 }
 
-/* LOADER */
+/* LOADING OVERLAY */
 #loader {
   position: fixed;
   inset: 0;
@@ -41,7 +40,7 @@ iframe {
   transition: opacity 1s ease;
 }
 
-/* CANVAS PARTICLES */
+/* CANVAS */
 #particles {
   position: absolute;
   inset: 0;
@@ -69,59 +68,13 @@ iframe {
   box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ================= HEADER ================= */
-#header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 25vh;
-  background: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 35px);
-  z-index: 5000;
-  pointer-events: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-}
-
-/* HEADER PARTICLES */
-#header-canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-/* HEADER IMAGE */
-#header img {
-  width: 150px;
-  height: auto;
-  z-index: 1;
-}
-
-/* HEADER TEXT */
-#header-text {
-  color: #d8b4ff;
-  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
-  font-size: 28px;
-  text-shadow: 0 0 10px rgba(180,100,255,0.7);
-  margin-top: 10px;
-  z-index: 1;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>
 </head>
 
 <body>
-
-<!-- HEADER -->
-<div id="header">
-  <canvas id="header-canvas"></canvas>
-  <img src="images/btn2.png" alt="Roblox Button">
-  <div id="header-text">Roblox Launcher</div>
-</div>
 
 <!-- LOADER -->
 <div id="loader">
@@ -131,94 +84,81 @@ iframe {
 </div>
 
 <!-- GAME -->
-<iframe id="game"
-src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol"
-allowfullscreen></iframe>
+<iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-nmweg%2Cfwn-arpq%2Fc%2F39%3B02%2F%60.jtol" allowfullscreen></iframe>
 
 <script>
-// ===== PARTICLES FOR MAIN LOADER =====
+// ===== PARTICLES =====
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
+
 let particles = [];
 
-function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 class Particle {
   constructor() {
-    this.x = Math.random()*canvas.width;
-    this.y = Math.random()*canvas.height;
-    this.radius = Math.random()*2+1;
-    this.speedX = (Math.random()-0.5)*0.4;
-    this.speedY = (Math.random()-0.5)*0.4;
-    this.color = Math.random()>0.5?"#2b0033":"#b46bff";
-    this.alpha = Math.random()*0.6+0.2;
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
+    this.alpha = Math.random() * 0.6 + 0.2;
   }
-  update() { this.x+=this.speedX; this.y+=this.speedY; if(this.x<0||this.x>canvas.width)this.speedX*=-1; if(this.y<0||this.y>canvas.height)this.speedY*=-1; }
-  draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.radius,0,Math.PI*2); ctx.fillStyle=this.color; ctx.globalAlpha=this.alpha; ctx.fill(); ctx.globalAlpha=1; }
-}
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
 
-for(let i=0;i<150;i++) particles.push(new Particle());
-(function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); })();
-
-// ===== HEADER PARTICLES =====
-const headerCanvas = document.getElementById("header-canvas");
-const hctx = headerCanvas.getContext("2d");
-let hParticles = [];
-
-function resizeHeader() {
-  headerCanvas.width = window.innerWidth;
-  headerCanvas.height = document.getElementById("header").offsetHeight;
-}
-resizeHeader();
-window.addEventListener("resize", resizeHeader);
-
-class HParticle {
-  constructor() {
-    this.x=Math.random()*headerCanvas.width;
-    this.y=Math.random()*headerCanvas.height;
-    this.radius=Math.random()*1.5+0.5;
-    this.speedX=(Math.random()-0.5)*0.2;
-    this.speedY=(Math.random()-0.5)*0.2;
-    this.color="#b46bff";
-    this.alpha=Math.random()*0.5+0.2;
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
   }
-  update(){ this.x+=this.speedX; this.y+=this.speedY; if(this.x<0||this.x>headerCanvas.width)this.speedX*=-1; if(this.y<0||this.y>headerCanvas.height)this.speedY*=-1; }
-  draw(){ hctx.beginPath(); hctx.arc(this.x,this.y,this.radius,0,Math.PI*2); hctx.fillStyle=this.color; hctx.globalAlpha=this.alpha; hctx.fill(); hctx.globalAlpha=1; }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
 }
 
-for(let i=0;i<50;i++) hParticles.push(new HParticle());
-(function animateHeader(){ hctx.clearRect(0,0,headerCanvas.width,headerCanvas.height); hParticles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animateHeader); })();
+for (let i = 0; i < 150; i++) {
+  particles.push(new Particle());
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
 
 // ===== LOADING TIMER =====
-const loader = document.getElementById("loader");
-const iframe = document.querySelector("iframe");
 setTimeout(() => {
+  const loader = document.getElementById("loader");
   loader.style.opacity = "0";
-  setTimeout(()=>loader.remove(),1000);
-  iframe.style.display="block";
-},5000);
+  setTimeout(() => loader.remove(), 1000);
+
+  // Show the iframe after loader
+  document.querySelector("iframe").style.display = "block";
+}, 5000);
 
 // ===== IFRAME RESIZE =====
-function resizeIframe() { iframe.style.width=innerWidth+"px"; iframe.style.height=innerHeight+"px"; }
+function resizeIframe() {
+  const f = document.querySelector("iframe");
+  f.style.width = window.innerWidth + "px";
+  f.style.height = window.innerHeight + "px";
+}
 window.addEventListener("resize", resizeIframe);
 resizeIframe();
-
-// ===== FAKE LAUNCH DETECTION =====
-// Detect click anywhere on header and trigger loader
-document.getElementById("header").addEventListener("click",()=>{
-  loader.style.display="flex";
-  loader.style.opacity="1";
-
-  // remove header and text
-  document.getElementById("header").remove();
-
-  setTimeout(()=>{
-    loader.style.opacity="0";
-    setTimeout(()=>loader.remove(),1000);
-  },10000);
-});
 </script>
 
 </body>
