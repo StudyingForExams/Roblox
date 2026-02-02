@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Roblox</title>
 
 <style>
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
   overflow: hidden;
-  background: radial-gradient(circle at top, #140016, #000);
+  background: black;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -20,8 +18,7 @@ html, body {
 iframe {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   border: none;
   display: none;
 }
@@ -30,22 +27,21 @@ iframe {
 #loader {
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at center, rgba(180,100,255,0.15), rgba(0,0,0,0.95)),
-    linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
-  backdrop-filter: blur(8px);
+  background: radial-gradient(circle at center, #1a001f, #000);
   z-index: 9999;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
   transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
+  user-select: none;
 }
 
 /* CANVAS */
 #particles {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 /* TEXT */
@@ -56,8 +52,9 @@ iframe {
   margin-bottom: 22px;
   z-index: 2;
   text-shadow:
-    0 0 10px rgba(180,100,255,0.6),
-    0 0 25px rgba(180,100,255,0.3);
+    0 0 10px rgba(180,100,255,0.8),
+    0 0 25px rgba(180,100,255,0.4);
+  user-select: none;
 }
 
 /* SPINNER */
@@ -84,13 +81,14 @@ iframe {
 #final-popup {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
   z-index: 10000;
   display: none;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.4s ease;
+  animation: fadeIn 0.4s ease forwards;
+  user-select: none;
 }
 
 @keyframes fadeIn {
@@ -169,7 +167,7 @@ iframe {
 <iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-120%2Cir.louge.dul%2Fcprs-a-1%3B920-b%2Chvmn" allowfullscreen></iframe>
 
 <script>
-// ===== PARTICLES =====
+// ===== PARTICLES (more shapes + glow) =====
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 let particles = [];
@@ -181,33 +179,88 @@ function resizeCanvas() {
 resizeCanvas();
 addEventListener("resize", resizeCanvas);
 
+// Particle types: circle, cross, star
 class Particle {
   constructor() {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
-    this.r = Math.random() * 2 + 1;
+    this.r = Math.random() * 1.7 + 0.8;
     this.vx = (Math.random() - 0.5) * 0.35;
     this.vy = (Math.random() - 0.5) * 0.35;
     this.a = Math.random() * 0.5 + 0.2;
     this.c = Math.random() > 0.5 ? "#3a0044" : "#c98bff";
+    this.type = ["circle", "cross", "star"][Math.floor(Math.random()*3)];
+    this.angle = Math.random() * Math.PI * 2;
+    this.angleSpeed = (Math.random() - 0.5) * 0.02;
   }
   update() {
     this.x += this.vx;
     this.y += this.vy;
+    this.angle += this.angleSpeed;
     if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
     if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
   }
   draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
     ctx.globalAlpha = this.a;
-    ctx.fillStyle = this.c;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fill();
+
+    if (this.type === "circle") {
+      // Glowing circle
+      let glow = ctx.createRadialGradient(0, 0, this.r*0.3, 0, 0, this.r*1.2);
+      glow.addColorStop(0, this.c);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, this.r * 1.2, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = this.c;
+      ctx.beginPath();
+      ctx.arc(0, 0, this.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    else if (this.type === "cross") {
+      // Cross shape with glow
+      ctx.strokeStyle = this.c;
+      ctx.shadowColor = this.c;
+      ctx.shadowBlur = 6;
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      ctx.moveTo(-this.r * 1.5, 0);
+      ctx.lineTo(this.r * 1.5, 0);
+      ctx.moveTo(0, -this.r * 1.5);
+      ctx.lineTo(0, this.r * 1.5);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    else if (this.type === "star") {
+      // Star with glow
+      ctx.fillStyle = this.c;
+      ctx.shadowColor = this.c;
+      ctx.shadowBlur = 8;
+
+      ctx.beginPath();
+      for(let i=0; i<5; i++) {
+        const rot = i * (Math.PI * 2 / 5);
+        const outer = this.r * 1.4;
+        const inner = this.r * 0.6;
+        ctx.lineTo(Math.cos(rot) * outer, Math.sin(rot) * outer);
+        ctx.lineTo(Math.cos(rot + Math.PI/5) * inner, Math.sin(rot + Math.PI/5) * inner);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
     ctx.globalAlpha = 1;
+    ctx.restore();
   }
 }
 
-for (let i = 0; i < 150; i++) particles.push(new Particle());
+for(let i=0; i<150; i++) particles.push(new Particle());
 
 (function animate() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -215,27 +268,58 @@ for (let i = 0; i < 150; i++) particles.push(new Particle());
   requestAnimationFrame(animate);
 })();
 
-// ===== IFRAME LOAD (HIDDEN) =====
+// ===== IFRAME LOAD (hidden initially) =====
 const iframe = document.querySelector("iframe");
 iframe.style.display = "block";
 
 // ===== FINAL POPUP LOGIC =====
 const popup = document.getElementById("final-popup");
 const popupOk = document.getElementById("popup-ok");
+const loader = document.getElementById("loader");
+const loadingText = document.getElementById("loading-text");
 
+popup.style.display = "none"; // hide popup initially
+
+// Show popup after 5 seconds (guaranteed to be after embedded alerts)
 setTimeout(() => {
   popup.style.display = "flex";
 }, 5000);
 
 popupOk.addEventListener("click", () => {
+  // Hide popup and everything except loading text (for countdown)
   popup.style.display = "none";
 
-  setTimeout(() => {
-    const loader = document.getElementById("loader");
-    loader.style.opacity = "0";
-    setTimeout(() => loader.remove(), 1200);
-  }, 17500);
+  // Hide spinner & canvas so only loading text remains
+  loader.querySelector(".spinner").style.display = "none";
+  canvas.style.display = "none";
+
+  // Start 10-second countdown on loading text
+  let timeLeft = 10;
+  loadingText.textContent = `LOADING (${timeLeft})`;
+
+  const countdown = setInterval(() => {
+    timeLeft--;
+    loadingText.textContent = `LOADING (${timeLeft})`;
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      // Fade out loader completely
+      loader.style.opacity = "0";
+      setTimeout(() => {
+        loader.remove();
+        // Reveal iframe fully
+        iframe.style.display = "block";
+      }, 1200);
+    }
+  }, 1000);
 });
+
+// ===== IFRAME RESIZE =====
+function resizeIframe() {
+  iframe.style.width = innerWidth + "px";
+  iframe.style.height = innerHeight + "px";
+}
+addEventListener("resize", resizeIframe);
+resizeIframe();
 </script>
 
 </body>
