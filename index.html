@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Roblox</title>
 
 <style>
 html, body {
-  margin: 0; padding: 0;
-  width: 100%; height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: black;
   font-family: 'Segoe UI', sans-serif;
@@ -18,12 +20,13 @@ html, body {
 iframe {
   position: fixed;
   inset: 0;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   border: none;
-  display: none;
+  display: none; /* never shown until loader fully removed */
 }
 
-/* LOADER */
+/* LOADING OVERLAY */
 #loader {
   position: fixed;
   inset: 0;
@@ -33,48 +36,39 @@ iframe {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
-  user-select: none;
+  transition: opacity 1s ease;
 }
 
 /* CANVAS */
 #particles {
   position: absolute;
   inset: 0;
-  pointer-events: none;
 }
 
-/* TEXT */
+/* LOADING TEXT */
 #loading-text {
-  color: #e9d8ff;
+  color: #d8b4ff;
   font-size: 28px;
-  letter-spacing: 3px;
-  margin-bottom: 22px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
   z-index: 2;
-  text-shadow:
-    0 0 10px rgba(180,100,255,0.8),
-    0 0 25px rgba(180,100,255,0.4);
-  user-select: none;
+  text-shadow: 0 0 15px rgba(180, 100, 255, 0.6);
 }
 
 /* SPINNER */
 .spinner {
-  width: 72px;
-  height: 72px;
+  width: 70px;
+  height: 70px;
+  border: 4px solid rgba(180, 100, 255, 0.2);
+  border-top: 4px solid #b46bff;
   border-radius: 50%;
-  border: 4px solid rgba(180,100,255,0.2);
-  border-top-color: #c98bff;
-  animation: spin 1s linear infinite, glow 2.5s ease-in-out infinite;
+  animation: spin 1s linear infinite;
   z-index: 2;
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 18px rgba(180,100,255,0.4); }
-  50% { box-shadow: 0 0 35px rgba(180,100,255,0.85); }
 }
 
 /* FINAL POPUP */
@@ -82,81 +76,55 @@ iframe {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
   z-index: 10000;
   display: none;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.4s ease forwards;
-  user-select: none;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .popup-box {
-  background: linear-gradient(
-    180deg,
-    rgba(40,10,60,0.95),
-    rgba(20,0,30,0.95)
-  );
-  border-radius: 18px;
-  border: 1px solid rgba(200,150,255,0.35);
-  padding: 28px 40px;
+  background: #120014;
+  border: 2px solid #b46bff;
+  border-radius: 14px;
+  padding: 25px 35px;
   text-align: center;
-  color: #f1e6ff;
+  color: #d8b4ff;
   font-size: 18px;
-  box-shadow:
-    0 0 40px rgba(180,100,255,0.55),
-    inset 0 0 20px rgba(255,255,255,0.05);
-  transform: scale(0.96);
-  animation: pop 0.35s cubic-bezier(.34,1.56,.64,1) forwards;
-}
-
-@keyframes pop {
-  to { transform: scale(1); }
+  box-shadow: 0 0 30px rgba(180,100,255,0.6);
 }
 
 .popup-box button {
-  margin-top: 24px;
-  padding: 10px 26px;
+  margin-top: 20px;
+  padding: 8px 20px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #d7a8ff, #b46bff);
+  background: #b46bff;
   border: none;
-  color: #1a001f;
+  color: black;
   font-size: 16px;
-  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(180,100,255,0.6);
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    filter 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-
 .popup-box button:hover {
   transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: 0 10px 28px rgba(180,100,255,0.85);
+  box-shadow: 0 6px 20px rgba(180,100,255,0.7);
 }
-
 .popup-box button:active {
   transform: translateY(1px);
-  box-shadow: 0 4px 14px rgba(180,100,255,0.5);
+  box-shadow: 0 4px 12px rgba(180,100,255,0.5);
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOADER -->
 <div id="loader">
   <canvas id="particles"></canvas>
   <div id="loading-text">LOADING</div>
   <div class="spinner"></div>
 </div>
 
+<!-- FINAL POPUP -->
 <div id="final-popup">
   <div class="popup-box">
     <p id="popup-message">Please confirm to continue.</p>
@@ -164,113 +132,55 @@ iframe {
   </div>
 </div>
 
+<!-- GAME -->
 <iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-120%2Cir.louge.dul%2Fcprs-a-1%3B920-b%2Chvmn" allowfullscreen></iframe>
 
 <script>
-// ===== PARTICLES (more shapes + glow) =====
+// ===== PARTICLES =====
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 let particles = [];
 
 function resizeCanvas() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 resizeCanvas();
-addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
-// Particle types: circle, cross, star
 class Particle {
   constructor() {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
-    this.r = Math.random() * 1.7 + 0.8;
-    this.vx = (Math.random() - 0.5) * 0.35;
-    this.vy = (Math.random() - 0.5) * 0.35;
-    this.a = Math.random() * 0.5 + 0.2;
-    this.c = Math.random() > 0.5 ? "#3a0044" : "#c98bff";
-    this.type = ["circle", "cross", "star"][Math.floor(Math.random()*3)];
-    this.angle = Math.random() * Math.PI * 2;
-    this.angleSpeed = (Math.random() - 0.5) * 0.02;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
+    this.alpha = Math.random() * 0.6 + 0.2;
   }
   update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.angle += this.angleSpeed;
-    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
   }
   draw() {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.angle);
-    ctx.globalAlpha = this.a;
-
-    if (this.type === "circle") {
-      // Glowing circle
-      let glow = ctx.createRadialGradient(0, 0, this.r*0.3, 0, 0, this.r*1.2);
-      glow.addColorStop(0, this.c);
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(0, 0, this.r * 1.2, 0, Math.PI*2);
-      ctx.fill();
-
-      ctx.fillStyle = this.c;
-      ctx.beginPath();
-      ctx.arc(0, 0, this.r, 0, Math.PI*2);
-      ctx.fill();
-    }
-    else if (this.type === "cross") {
-      // Cross shape with glow
-      ctx.strokeStyle = this.c;
-      ctx.shadowColor = this.c;
-      ctx.shadowBlur = 6;
-      ctx.lineWidth = 2;
-
-      ctx.beginPath();
-      ctx.moveTo(-this.r * 1.5, 0);
-      ctx.lineTo(this.r * 1.5, 0);
-      ctx.moveTo(0, -this.r * 1.5);
-      ctx.lineTo(0, this.r * 1.5);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-    }
-    else if (this.type === "star") {
-      // Star with glow
-      ctx.fillStyle = this.c;
-      ctx.shadowColor = this.c;
-      ctx.shadowBlur = 8;
-
-      ctx.beginPath();
-      for(let i=0; i<5; i++) {
-        const rot = i * (Math.PI * 2 / 5);
-        const outer = this.r * 1.4;
-        const inner = this.r * 0.6;
-        ctx.lineTo(Math.cos(rot) * outer, Math.sin(rot) * outer);
-        ctx.lineTo(Math.cos(rot + Math.PI/5) * inner, Math.sin(rot + Math.PI/5) * inner);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
-
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
     ctx.globalAlpha = 1;
-    ctx.restore();
   }
 }
 
-for(let i=0; i<150; i++) particles.push(new Particle());
+for (let i = 0; i < 150; i++) particles.push(new Particle());
 
-(function animate() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+(function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animateParticles);
 })();
-
-// ===== IFRAME LOAD (hidden initially) =====
-const iframe = document.querySelector("iframe");
-iframe.style.display = "block";
 
 // ===== FINAL POPUP LOGIC =====
 const popup = document.getElementById("final-popup");
@@ -278,22 +188,19 @@ const popupOk = document.getElementById("popup-ok");
 const loader = document.getElementById("loader");
 const loadingText = document.getElementById("loading-text");
 
-popup.style.display = "none"; // hide popup initially
-
-// Show popup after 5 seconds (guaranteed to be after embedded alerts)
+// Show popup after 5 seconds
 setTimeout(() => {
   popup.style.display = "flex";
 }, 5000);
 
+// Popup interaction triggers 10-second loader countdown
 popupOk.addEventListener("click", () => {
-  // Hide popup and everything except loading text (for countdown)
   popup.style.display = "none";
 
-  // Hide spinner & canvas so only loading text remains
-  loader.querySelector(".spinner").style.display = "none";
+  // Hide spinner and particles for clean countdown
   canvas.style.display = "none";
+  loader.querySelector(".spinner").style.display = "none";
 
-  // Start 10-second countdown on loading text
   let timeLeft = 10;
   loadingText.textContent = `LOADING (${timeLeft})`;
 
@@ -302,23 +209,22 @@ popupOk.addEventListener("click", () => {
     loadingText.textContent = `LOADING (${timeLeft})`;
     if (timeLeft <= 0) {
       clearInterval(countdown);
-      // Fade out loader completely
       loader.style.opacity = "0";
       setTimeout(() => {
         loader.remove();
-        // Reveal iframe fully
-        iframe.style.display = "block";
-      }, 1200);
+        document.querySelector("iframe").style.display = "block";
+      }, 1000);
     }
   }, 1000);
 });
 
 // ===== IFRAME RESIZE =====
 function resizeIframe() {
-  iframe.style.width = innerWidth + "px";
-  iframe.style.height = innerHeight + "px";
+  const f = document.querySelector("iframe");
+  f.style.width = window.innerWidth + "px";
+  f.style.height = window.innerHeight + "px";
 }
-addEventListener("resize", resizeIframe);
+window.addEventListener("resize", resizeIframe);
 resizeIframe();
 </script>
 
