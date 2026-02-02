@@ -75,7 +75,7 @@ iframe {
 #final-popup {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.85); /* stronger overlay */
   z-index: 10000;
   display: none;
   align-items: center;
@@ -108,26 +108,30 @@ iframe {
   opacity: 1;
 }
 
-/* BUTTON */
+/* BUTTON - Updated for wider, glowing, modern look */
 .popup-box button {
   margin-top: 30px;
-  padding: 28px 70px; /* 1.75x bigger */
-  border-radius: 40px;
-  background: linear-gradient(145deg, #b46bff, #9a42ff);
+  padding: 30px 120px; /* Wider button */
+  border-radius: 50px; /* Smooth pill shape */
+  background: linear-gradient(145deg, #b46bff, #9a42ff); /* original colors */
   border: none;
-  color: black;
-  font-size: 24px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 600;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-  touch-action: manipulation;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.8), 0 0 40px rgba(180,100,255,0.4);
+  backdrop-filter: blur(5px); /* frosted effect */
 }
 .popup-box button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(180,100,255,0.6);
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(180, 100, 255, 0.9), 0 0 50px rgba(180,100,255,0.5);
+  background: linear-gradient(145deg, #c67aff, #a13bff);
 }
 .popup-box button:active {
   transform: scale(0.97);
-  box-shadow: 0 6px 20px rgba(180,100,255,0.5);
+  box-shadow: 0 0 20px rgba(180,100,255,0.7), 0 0 35px rgba(180,100,255,0.4);
 }
 </style>
 </head>
@@ -144,7 +148,7 @@ iframe {
 <!-- FINAL POPUP -->
 <div id="final-popup">
   <div class="popup-box">
-    <p id="popup-message">Launch Roblox.</p>
+    <p id="popup-message">Please confirm to continue.</p>
     <button id="popup-ok">OK</button>
   </div>
 </div>
@@ -209,11 +213,10 @@ setTimeout(() => {
   popup.classList.add("show");
 }, 5000);
 
-// Popup interaction triggers 10-second loader (same as start) without countdown
+// Popup interaction triggers 10-second loader (same as start)
 popupOk.addEventListener("click", () => {
   popup.classList.remove("show");
 
-  // Keep the loader as-is for 10 seconds
   setTimeout(() => {
     loader.style.opacity = "0";
     setTimeout(() => {
