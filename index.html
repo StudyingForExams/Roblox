@@ -23,7 +23,7 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
-  display: none; /* hidden until loader fully removed */
+  display: none; /* hidden until loader removed */
 }
 
 /* LOADING OVERLAY */
@@ -80,38 +80,54 @@ iframe {
   display: none;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#final-popup.show {
+  display: flex;
+  opacity: 1;
 }
 
 .popup-box {
   background: #120014;
   border: 2px solid #b46bff;
-  border-radius: 18px;
-  padding: 30px 40px;
+  border-radius: 20px;
+  padding: 35px 50px;
   text-align: center;
   color: #d8b4ff;
-  font-size: 20px;
+  font-size: 22px;
   box-shadow: 0 0 30px rgba(180,100,255,0.6);
+  transform: scale(0.8);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  opacity: 0;
 }
 
+#final-popup.show .popup-box {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* BUTTON */
 .popup-box button {
-  margin-top: 25px;
-  padding: 18px 40px;
-  border-radius: 30px;
-  background: #b46bff;
+  margin-top: 30px;
+  padding: 28px 70px; /* 1.75x bigger */
+  border-radius: 40px;
+  background: linear-gradient(145deg, #b46bff, #9a42ff);
   border: none;
   color: black;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
   touch-action: manipulation;
 }
 .popup-box button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(180,100,255,0.7);
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(180,100,255,0.6);
 }
 .popup-box button:active {
-  transform: translateY(1px);
-  box-shadow: 0 6px 16px rgba(180,100,255,0.5);
+  transform: scale(0.97);
+  box-shadow: 0 6px 20px rgba(180,100,255,0.5);
 }
 </style>
 </head>
@@ -128,7 +144,7 @@ iframe {
 <!-- FINAL POPUP -->
 <div id="final-popup">
   <div class="popup-box">
-    <p id="popup-message">Please confirm to continue.</p>
+    <p id="popup-message">Launch Roblox.</p>
     <button id="popup-ok">OK</button>
   </div>
 </div>
@@ -187,32 +203,24 @@ for (let i = 0; i < 150; i++) particles.push(new Particle());
 const popup = document.getElementById("final-popup");
 const popupOk = document.getElementById("popup-ok");
 const loader = document.getElementById("loader");
-const loadingText = document.getElementById("loading-text");
 
 // Show popup after 5 seconds
 setTimeout(() => {
-  popup.style.display = "flex";
+  popup.classList.add("show");
 }, 5000);
 
-// Popup interaction triggers 10-second loader countdown
+// Popup interaction triggers 10-second loader (same as start) without countdown
 popupOk.addEventListener("click", () => {
-  popup.style.display = "none";
+  popup.classList.remove("show");
 
-  let timeLeft = 10;
-  loadingText.textContent = `LOADING (${timeLeft})`;
-
-  const countdown = setInterval(() => {
-    timeLeft--;
-    loadingText.textContent = `LOADING (${timeLeft})`;
-    if (timeLeft <= 0) {
-      clearInterval(countdown);
-      loader.style.opacity = "0";
-      setTimeout(() => {
-        loader.remove();
-        document.querySelector("iframe").style.display = "block";
-      }, 1000);
-    }
-  }, 1000);
+  // Keep the loader as-is for 10 seconds
+  setTimeout(() => {
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.remove();
+      document.querySelector("iframe").style.display = "block";
+    }, 1000);
+  }, 10000);
 });
 
 // ===== IFRAME RESIZE =====
