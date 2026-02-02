@@ -23,7 +23,7 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
-  display: none; /* hidden until loader removed */
+  display: none;
 }
 
 /* LOADING OVERLAY */
@@ -75,7 +75,7 @@ iframe {
 #final-popup {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85); /* stronger overlay */
+  background: rgba(0,0,0,0.85);
   z-index: 10000;
   display: none;
   align-items: center;
@@ -99,8 +99,8 @@ iframe {
   font-size: 22px;
   box-shadow: 0 0 30px rgba(180,100,255,0.6);
   transform: scale(0.8);
-  transition: transform 0.35s ease, opacity 0.35s ease;
   opacity: 0;
+  transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
 #final-popup.show .popup-box {
@@ -108,30 +108,48 @@ iframe {
   opacity: 1;
 }
 
-/* BUTTON - Updated for wider, glowing, modern look */
+/* BUTTON - Modern 3D / Glassy style */
 .popup-box button {
   margin-top: 30px;
-  padding: 30px 120px; /* Wider button */
-  border-radius: 50px; /* Smooth pill shape */
-  background: linear-gradient(145deg, #b46bff, #9a42ff); /* original colors */
+  padding: 28px 120px;
+  border-radius: 50px;
+  background: linear-gradient(145deg, #b46bff, #9a42ff);
   border: none;
   color: #fff;
   font-size: 26px;
   font-weight: 600;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
-  box-shadow: 0 0 20px rgba(180, 100, 255, 0.8), 0 0 40px rgba(180,100,255,0.4);
-  backdrop-filter: blur(5px); /* frosted effect */
+  transition: transform 0.2s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+  box-shadow: 0 4px 15px rgba(180,100,255,0.7), 0 0 25px rgba(180,100,255,0.4) inset;
+  backdrop-filter: blur(4px);
+  animation: popIn 0.5s ease forwards; /* pop-in animation */
 }
+
+/* Hover effects */
 .popup-box button:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 30px rgba(180, 100, 255, 0.9), 0 0 50px rgba(180,100,255,0.5);
+  box-shadow: 0 6px 25px rgba(180,100,255,0.9), 0 0 45px rgba(180,100,255,0.5) inset;
   background: linear-gradient(145deg, #c67aff, #a13bff);
 }
+
+/* Active press effect */
 .popup-box button:active {
   transform: scale(0.97);
-  box-shadow: 0 0 20px rgba(180,100,255,0.7), 0 0 35px rgba(180,100,255,0.4);
+  box-shadow: 0 3px 15px rgba(180,100,255,0.7), 0 0 30px rgba(180,100,255,0.4) inset;
+}
+
+/* Pop-in animation */
+@keyframes popIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Fade-out animation when clicked */
+.fadeOut {
+  opacity: 0 !important;
+  transform: scale(0.8) !important;
 }
 </style>
 </head>
@@ -213,8 +231,12 @@ setTimeout(() => {
   popup.classList.add("show");
 }, 5000);
 
-// Popup interaction triggers 10-second loader (same as start)
+// Popup click triggers fade-out + loader
 popupOk.addEventListener("click", () => {
+  // Animate button fade-out
+  popupOk.classList.add("fadeOut");
+
+  // Animate popup fade (optional)
   popup.classList.remove("show");
 
   setTimeout(() => {
