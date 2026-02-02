@@ -12,7 +12,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: black;
+  background: radial-gradient(circle at top, #140016, #000);
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -23,20 +23,23 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
-  display: none; /* NEVER shown until loader is removed */
+  display: none;
 }
 
-/* LOADING OVERLAY */
+/* LOADER */
 #loader {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, #1a001f, #000);
+  background:
+    radial-gradient(circle at center, rgba(180,100,255,0.15), rgba(0,0,0,0.95)),
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+  backdrop-filter: blur(8px);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  transition: opacity 1s ease;
+  transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
 }
 
 /* CANVAS */
@@ -47,73 +50,115 @@ iframe {
 
 /* TEXT */
 #loading-text {
-  color: #d8b4ff;
+  color: #e9d8ff;
   font-size: 28px;
-  letter-spacing: 2px;
-  margin-bottom: 20px;
+  letter-spacing: 3px;
+  margin-bottom: 22px;
   z-index: 2;
-  text-shadow: 0 0 15px rgba(180, 100, 255, 0.6);
+  text-shadow:
+    0 0 10px rgba(180,100,255,0.6),
+    0 0 25px rgba(180,100,255,0.3);
 }
 
 /* SPINNER */
 .spinner {
-  width: 70px;
-  height: 70px;
-  border: 4px solid rgba(180, 100, 255, 0.2);
-  border-top: 4px solid #b46bff;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  border: 4px solid rgba(180,100,255,0.2);
+  border-top-color: #c98bff;
+  animation: spin 1s linear infinite, glow 2.5s ease-in-out infinite;
   z-index: 2;
-  box-shadow: 0 0 20px rgba(180, 100, 255, 0.5);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 18px rgba(180,100,255,0.4); }
+  50% { box-shadow: 0 0 35px rgba(180,100,255,0.85); }
+}
+
 /* FINAL POPUP */
 #final-popup {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
   z-index: 10000;
   display: none;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .popup-box {
-  background: #120014;
-  border: 2px solid #b46bff;
-  padding: 25px 35px;
+  background: linear-gradient(
+    180deg,
+    rgba(40,10,60,0.95),
+    rgba(20,0,30,0.95)
+  );
+  border-radius: 18px;
+  border: 1px solid rgba(200,150,255,0.35);
+  padding: 28px 40px;
   text-align: center;
-  color: #d8b4ff;
+  color: #f1e6ff;
   font-size: 18px;
-  box-shadow: 0 0 30px rgba(180,100,255,0.6);
+  box-shadow:
+    0 0 40px rgba(180,100,255,0.55),
+    inset 0 0 20px rgba(255,255,255,0.05);
+  transform: scale(0.96);
+  animation: pop 0.35s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes pop {
+  to { transform: scale(1); }
 }
 
 .popup-box button {
-  margin-top: 20px;
-  padding: 8px 20px;
-  background: #b46bff;
+  margin-top: 24px;
+  padding: 10px 26px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d7a8ff, #b46bff);
   border: none;
-  color: black;
+  color: #1a001f;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 6px 18px rgba(180,100,255,0.6);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+}
+
+.popup-box button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 28px rgba(180,100,255,0.85);
+}
+
+.popup-box button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 14px rgba(180,100,255,0.5);
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOADER -->
 <div id="loader">
   <canvas id="particles"></canvas>
   <div id="loading-text">LOADING</div>
   <div class="spinner"></div>
 </div>
 
-<!-- FINAL POPUP -->
 <div id="final-popup">
   <div class="popup-box">
     <p id="popup-message">Please confirm to continue.</p>
@@ -121,7 +166,6 @@ iframe {
   </div>
 </div>
 
-<!-- GAME -->
 <iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-120%2Cir.louge.dul%2Fcprs-a-1%3B920-b%2Chvmn" allowfullscreen></iframe>
 
 <script>
@@ -142,10 +186,10 @@ class Particle {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
     this.r = Math.random() * 2 + 1;
-    this.vx = (Math.random() - 0.5) * 0.4;
-    this.vy = (Math.random() - 0.5) * 0.4;
-    this.c = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
-    this.a = Math.random() * 0.6 + 0.2;
+    this.vx = (Math.random() - 0.5) * 0.35;
+    this.vy = (Math.random() - 0.5) * 0.35;
+    this.a = Math.random() * 0.5 + 0.2;
+    this.c = Math.random() > 0.5 ? "#3a0044" : "#c98bff";
   }
   update() {
     this.x += this.vx;
@@ -154,10 +198,10 @@ class Particle {
     if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
   }
   draw() {
+    ctx.globalAlpha = this.a;
+    ctx.fillStyle = this.c;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = this.c;
-    ctx.globalAlpha = this.a;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
@@ -166,51 +210,32 @@ class Particle {
 for (let i = 0; i < 150; i++) particles.push(new Particle());
 
 (function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   particles.forEach(p => { p.update(); p.draw(); });
   requestAnimationFrame(animate);
 })();
 
 // ===== IFRAME LOAD (HIDDEN) =====
 const iframe = document.querySelector("iframe");
-iframe.style.display = "block"; // loads, but loader blocks view
+iframe.style.display = "block";
 
-// ===== FINAL CUSTOM POPUP =====
+// ===== FINAL POPUP LOGIC =====
 const popup = document.getElementById("final-popup");
-const popupMsg = document.getElementById("popup-message");
 const popupOk = document.getElementById("popup-ok");
 
-/* ✏️ EDIT THIS MESSAGE */
-popupMsg.textContent = "All required prompts have been displayed. Click OK to continue.";
-
-/*
-  IMPORTANT:
-  setTimeout will NOT count while iframe alerts are open.
-  This guarantees our popup appears AFTER all 3 alerts.
-*/
 setTimeout(() => {
   popup.style.display = "flex";
 }, 5000);
 
-// ===== USER CONFIRMS FINAL POPUP =====
 popupOk.addEventListener("click", () => {
   popup.style.display = "none";
 
-  // Loader countdown AFTER interaction
   setTimeout(() => {
     const loader = document.getElementById("loader");
     loader.style.opacity = "0";
-    setTimeout(() => loader.remove(), 1000);
-  }, 10000); // 10s countdown
+    setTimeout(() => loader.remove(), 1200);
+  }, 17500);
 });
-
-// ===== IFRAME RESIZE =====
-function resizeIframe() {
-  iframe.style.width = innerWidth + "px";
-  iframe.style.height = innerHeight + "px";
-}
-addEventListener("resize", resizeIframe);
-resizeIframe();
 </script>
 
 </body>
