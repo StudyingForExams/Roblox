@@ -19,12 +19,11 @@ html, body {
 /* IFRAME */
 iframe {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: none;
-  display: none; /* hidden until loader finishes */
+  display: none; /* NEVER shown until loader is removed */
 }
 
 /* LOADING OVERLAY */
@@ -71,6 +70,37 @@ iframe {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* FINAL POPUP */
+#final-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-box {
+  background: #120014;
+  border: 2px solid #b46bff;
+  padding: 25px 35px;
+  text-align: center;
+  color: #d8b4ff;
+  font-size: 18px;
+  box-shadow: 0 0 30px rgba(180,100,255,0.6);
+}
+
+.popup-box button {
+  margin-top: 20px;
+  padding: 8px 20px;
+  background: #b46bff;
+  border: none;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+}
 </style>
 </head>
 
@@ -83,6 +113,14 @@ iframe {
   <div class="spinner"></div>
 </div>
 
+<!-- FINAL POPUP -->
+<div id="final-popup">
+  <div class="popup-box">
+    <p id="popup-message">Please confirm to continue.</p>
+    <button id="popup-ok">OK</button>
+  </div>
+</div>
+
 <!-- GAME -->
 <iframe src="https://frogiesarcade.win/frog/ixl/hvtrs8%2F-120%2Cir.louge.dul%2Fcprs-a-1%3B920-b%2Chvmn" allowfullscreen></iframe>
 
@@ -90,74 +128,88 @@ iframe {
 // ===== PARTICLES =====
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
-
 let particles = [];
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
 }
 resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+addEventListener("resize", resizeCanvas);
 
 class Particle {
   constructor() {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
-    this.radius = Math.random() * 2 + 1;
-    this.speedX = (Math.random() - 0.5) * 0.4;
-    this.speedY = (Math.random() - 0.5) * 0.4;
-    this.color = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
-    this.alpha = Math.random() * 0.6 + 0.2;
+    this.r = Math.random() * 2 + 1;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.c = Math.random() > 0.5 ? "#2b0033" : "#b46bff";
+    this.a = Math.random() * 0.6 + 0.2;
   }
   update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-
-    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
   }
   draw() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
-    ctx.globalAlpha = this.alpha;
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.c;
+    ctx.globalAlpha = this.a;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
 }
 
-for (let i = 0; i < 150; i++) {
-  particles.push(new Particle());
-}
+for (let i = 0; i < 150; i++) particles.push(new Particle());
 
-function animateParticles() {
+(function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => {
-    p.update();
-    p.draw();
-  });
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+})();
 
-// ===== LOADING TIMER =====
+// ===== IFRAME LOAD (HIDDEN) =====
+const iframe = document.querySelector("iframe");
+iframe.style.display = "block"; // loads, but loader blocks view
+
+// ===== FINAL CUSTOM POPUP =====
+const popup = document.getElementById("final-popup");
+const popupMsg = document.getElementById("popup-message");
+const popupOk = document.getElementById("popup-ok");
+
+/* ✏️ EDIT THIS MESSAGE */
+popupMsg.textContent = "All required prompts have been displayed. Click OK to continue.";
+
+/*
+  IMPORTANT:
+  setTimeout will NOT count while iframe alerts are open.
+  This guarantees our popup appears AFTER all 3 alerts.
+*/
 setTimeout(() => {
-  const loader = document.getElementById("loader");
-  loader.style.opacity = "0";
-  setTimeout(() => loader.remove(), 1000);
+  popup.style.display = "flex";
+}, 5000);
 
-  // Show the iframe after loader
-  document.querySelector("iframe").style.display = "block";
-}, 15000);
+// ===== USER CONFIRMS FINAL POPUP =====
+popupOk.addEventListener("click", () => {
+  popup.style.display = "none";
+
+  // Loader countdown AFTER interaction
+  setTimeout(() => {
+    const loader = document.getElementById("loader");
+    loader.style.opacity = "0";
+    setTimeout(() => loader.remove(), 1000);
+  }, 10000); // 10s countdown
+});
 
 // ===== IFRAME RESIZE =====
 function resizeIframe() {
-  const f = document.querySelector("iframe");
-  f.style.width = window.innerWidth + "px";
-  f.style.height = window.innerHeight + "px";
+  iframe.style.width = innerWidth + "px";
+  iframe.style.height = innerHeight + "px";
 }
-window.addEventListener("resize", resizeIframe);
+addEventListener("resize", resizeIframe);
 resizeIframe();
 </script>
 
